@@ -3,6 +3,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const helmet = require("helmet");
 const morgan = require("morgan");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
@@ -25,6 +26,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(cors());
 
 //app.use("/api/auth", authRoute);
 app.use("/api", userRoute);
