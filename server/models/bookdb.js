@@ -14,12 +14,14 @@ const bookSchema = new mongoose.Schema(
       type: Array,
     },
     publisher: {
-        type: String,
-        required: true,
+      type: String,
     },
     author: {
-        type: Array,
-        required: true,
+      type: Array,
+    },
+    quantity: {
+      type: Number,
+      required: true,
     },
     img: {
       type: String,
@@ -28,5 +30,4 @@ const bookSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-module.exports = mongoose.model("bookdb.js",bookSchema)
+module.exports = mongoose.model("bookdb.js", bookSchema);
