@@ -1,21 +1,20 @@
-const Loan = require("../models/loandb");
+const Return = require("../models/returndb");
 const upbook = require("../models/bookdb");
 
-
-//save
-module.exports.addloan = async (req, res) => {
-    const { userid, loan, loandate, returndate } = req.body;
+module.exports.addreturn = async (req, res) => {
+    const { userid, returnbook } = req.body;
     try {
-        const loan = await Loan.create({ userid, loan, loandate, returndate });
-        res.status(201).json(loan);
+        const retbook = await Return.create({  userid, returnbook });
+        res.status(201).json(retbook);
       }
       catch(err) {
         const errors = handleErrors(err);
         res.status(400).json({ errors });
       }
 }
+
 //update book quantity
-module.exports.updateloan = async (req, res) => {
+module.exports.updatereturn = async (req, res) => {
   try {
       const updatedbook = await upbook.updateOne({_id:req.params.id}, {$set: req.body});
       res.status(200).json(updatedbook);
