@@ -11,7 +11,7 @@ const bookSchema = new mongoose.Schema(
       type: String,
     },
     category: {
-      type: Array,
+      type: String,
     },
     publisher: {
       type: String,
@@ -30,4 +30,4 @@ const bookSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("bookdb.js", bookSchema);
+module.exports = mongoose.model("bookdb", bookSchema);

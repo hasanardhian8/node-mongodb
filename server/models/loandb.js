@@ -12,10 +12,6 @@ const loanSchema = new mongoose.Schema(
         bookid:{
             type:String,
         },
-        quantity:{
-            type:Number,
-            default:1,
-        }
       },
     ],
     loandate:{
@@ -30,4 +26,4 @@ const loanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("loandb.js", loanSchema);
+module.exports = mongoose.model("loandb", loanSchema);

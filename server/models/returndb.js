@@ -7,7 +7,7 @@ const returnSchema = new mongoose.Schema(
       required: true,
       //unique: true,
     },
-    return: [
+    returnbook: [
       {
         bookid:{
             type:String,
@@ -24,4 +24,4 @@ const returnSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("returndb.js", returnSchema);
+module.exports = mongoose.model("returndb", returnSchema);
