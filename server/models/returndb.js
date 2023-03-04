@@ -7,17 +7,9 @@ const returnSchema = new mongoose.Schema(
       required: true,
       //unique: true,
     },
-    returnbook: [
-      {
-        bookid:{
-            type:String,
-        },
-        quantity:{
-            type:Number,
-            default:1,
-        }
-      },
-    ],
+     returnbook: [{
+        bookid:String
+      }],
     //get date return
     //date+7
   },

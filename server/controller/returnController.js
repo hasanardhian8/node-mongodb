@@ -1,24 +1,23 @@
 const Return = require("../models/returndb");
-const upbook = require("../models/bookdb");
 
-module.exports.addreturn = async (req, res) => {
+module.exports.getReturn = async (req, res) => {
+  try {
+    const gret = await Return.find();
+    res.status(201).json(gret);
+  } catch (err) {
+    //const errors = handleErrors(err);
+    res.status(400).json("error");
+  }
+};
+module.exports.addReturn = async (req, res) => {
     const { userid, returnbook } = req.body;
     try {
-        const retbook = await Return.create({  userid, returnbook });
+        const retbook = await Return.create(
+          {  userid, returnbook }
+          );
         res.status(201).json(retbook);
       }
-      catch(err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
+      catch(err) {    
+        res.status(400).json("error");
       }
-}
-
-//update book quantity
-module.exports.updatereturn = async (req, res) => {
-  try {
-      const updatedbook = await upbook.updateOne({_id:req.params.id}, {$set: req.body});
-      res.status(200).json(updatedbook);
-  } catch (error) {
-      res.status(400).json({message: error.message});
-  }
 }

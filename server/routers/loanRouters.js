@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const loanController = require("../controller/loanController")
 
-router.post('/addloan', loanController.addloan)
-router.post('/updatereturn', returnController.updatereturn)
+router.post('/addloan', loanController.addLoan)
+router.get('/loan', loanController.get)
 
 module.exports = router;

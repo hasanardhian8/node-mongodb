@@ -1,27 +1,37 @@
-const mongoose = require("mongoose");
-const { isEmail } = require('validator');
-const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
 
 const usersSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      trim: true,
+       required : [true, 'Please add a Username'],
+       maxlength: 32
     },
     email: {
       type: String,
-      required: [true, 'please enter an email'],
-      unique: true,
-      validate:[isEmail,'please enter a valid email']
+       trim: true,
+       required : [true, 'Please add a E-mail'],
+       unique: true,
+       match: [
+           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+           'Please add a valid E-mail'
+       ]
     },
     password: {
       type: String,
-      required: [true, 'please enter an password'],
-      minLength:[6,'minimum password length is 6 character']
+       trim: true,
+       required : [true, 'Please add a Password'],
+       minlength: [6, 'password must have at least six(6) characters'],
+       match: [
+           /^(?=.*\d)(?=.*[@#\-_$%^&+=§!\?])(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z@#\-_$%^&+=§!\?]+$/,
+           'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and a special characters'
+       ]
     },
     role: {
       type: Number,
-      required: true,
       default:0,
     },
   },
@@ -36,17 +46,16 @@ usersSchema.pre("save", async function(next){
   this.password = await bcrypt.hash(this.password, 10);
 })
 
-usersSchema.statics.login= async function(email,password){
-  const user = await this.findOne({email});
-  if (user) {
-    const auth = await bcrypt.compare(password,user.password);
-    if (auth) {
-      return user
-    }
-    throw Error('incorrect password');
-  }
-  throw Error('incorrect email');
-};
+// verify password
+usersSchema.methods.comparePassword = async function(yourPassword){
+  return await bcrypt.compare(yourPassword, this.password);
+}
 
- const User = mongoose.model("usersdb",usersSchema);
- module.exports = User
+// get the token
+usersSchema.methods.jwtGenerateToken = function(){
+  return jwt.sign({id: this.id}, process.env.JWT_SECRET, {
+      expiresIn: 3600
+  });
+}
+
+module.exports = mongoose.model("usersdb",usersSchema);

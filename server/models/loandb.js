@@ -5,23 +5,10 @@ const loanSchema = new mongoose.Schema(
     userid: {
       type: String,
       required: true,
-      //unique: true,
     },
-    loan: [
-      {
-        bookid:{
-            type:String,
-        },
-      },
-    ],
-    loandate:{
-      type: Date,
-      //default: Date.now
-    },
-    returndate:{
-      type: Date,
-      //default: ()=>new Date(+new Date() + 7*24*60*60*1000)
-    }
+    loan: [{
+      bookid:String
+    }],
   },
   { timestamps: true }
 );

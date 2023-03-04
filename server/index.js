@@ -1,15 +1,20 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const app = express();
 const dotenv = require('dotenv');
+dotenv.config();
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const cors = require('cors');
 const cookieParser = require("cookie-parser");
+const errorHandler = require('./middleware/error');
 
 //import routes
 const authRouters = require('./routers/authRouters');
 const bookRouter = require('./routers/bookRouters');
-const { requireAuth, checkUser } = require('./middleware/authMiddleware');
-
-dotenv.config();
-const app = express();
+const loanRouter = require('./routers/loanRouters');
+const returnRouter = require('./routers/returnRouters');
+const { requireAuth, checkUser } = require('./middleware/auth');
 
 //connect database
 mongoose
@@ -17,16 +22,23 @@ mongoose
     .then(()=>console.log("connected db"))
     .catch((err)=>{console.log(err);})
 
-//middleware
-app.use(express.json());
+// MIDDLEWARE
+app.use(morgan('dev'));
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    limit: '100mb',
+    extended: true
+    }));
 app.use(cookieParser());
+app.use(cors());
 
-app.get('*', checkUser);
-app.get('/', (req, res) => res.send('home'));
-app.get('/masuk', requireAuth, (req, res) => res.send('halaman pesanan'));
 
-app.use(authRouters);
-app.use(bookRouter);
+// ROUTES MIDDLEWARE
+app.use("/api", authRouters)
+
+
+//ERROR MIDDLEWARE
+app.use(errorHandler);
 
 
 app.listen(process.env.PORT || 5000, ()=>{
