@@ -13,7 +13,7 @@ module.exports.get = async (req, res) => {
 module.exports.add = async (req, res) => {
   const { title, desc, category, publisher, author, quantity, img } = req.body;
   try {
-    const book = await Book.insert({
+    const book = await Book.create({
       title,
       desc,
       category,
@@ -25,7 +25,7 @@ module.exports.add = async (req, res) => {
     res.status(201).json(book);
   } catch (err) {
     //const errors = handleErrors(err);
-    res.status(400).json("error");
+    res.status(400).json("tekan error");
   }
 };
 

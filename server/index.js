@@ -34,7 +34,8 @@ app.use(cors());
 
 
 // ROUTES MIDDLEWARE
-app.use("/api", authRouters)
+app.use("/api", authRouters);
+app.use('/api',bookRouter)
 
 
 //ERROR MIDDLEWARE

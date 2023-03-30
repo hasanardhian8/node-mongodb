@@ -26,9 +26,16 @@ exports.isAuthenticated = async (req, res, next) =>{
 
 // admin middleware
 exports.isAdmin = (req, res, next) =>{
-    if (req.user.role === 0){
+    if (req.user.role !== 0){
         return next (new ErrorResponse('Access denied, you must be an admin', 401));
     }
     next();
+}
 
+// manager middleware
+exports.isManager = (req, res, next) =>{
+    if (req.user.role !== 1 || req.user.role !== 0){
+        return next (new ErrorResponse('Access denied', 401));
+    }
+    next();
 }

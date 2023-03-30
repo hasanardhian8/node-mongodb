@@ -32,7 +32,8 @@ const usersSchema = new mongoose.Schema(
     },
     role: {
       type: Number,
-      default:0,
+      default:2,
+      //0=admin, 1=manager, 2=user
     },
   },
   { timestamps: true }
