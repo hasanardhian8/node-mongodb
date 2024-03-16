@@ -1,117 +1,90 @@
 const User = require("../models/usersdb");
-const ErrorResponse = require('../utils/errorResponse');
+const ErrorResponse = require("../utils/errorResponse");
 
+exports.signup = async (req, res, next) => {
+  const { email } = req.body;
+  const userExist = await User.findOne({ email });
 
-exports.signup = async (req, res, next)=>{
+  if (userExist) {
+    return next(new ErrorResponse("E-mail already exists", 400));
+  }
 
-    const {email} = req.body;
-    const userExist = await User.findOne({email});
-    
-    if (userExist){
-      
-     return  next(new ErrorResponse('E-mail already exists', 400))
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+exports.signin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return next(new ErrorResponse("E-mail and password are required", 400));
     }
 
-    try {
-        const user = await User.create(req.body);
-        res.status(201).json({
-            success: true,
-            user
-        })
-        
-    } catch (error) {
-        console.log(error);
-        next(error);
-        
+    // check user e-mail
+    const user = await User.findOneAndUpdate({ email }, { lastLogin: Date.now() });
+    if (!user) {
+      return next(new ErrorResponse("Invalid credentials", 400));
     }
-   
-}
 
-
-exports.signin = async (req, res, next)=>{
-
-    try{
-        const {email, password} = req.body;
-        if(!email || !password){
-       
-            return  next(new ErrorResponse('E-mail and password are required', 400))
-        }
-
-        // check user e-mail
-        const user = await User.findOne({email});
-        if(!user){
-           
-            return  next(new ErrorResponse('Invalid credentials', 400))
-        }
-
-        // verify user password
-        const isMatched = await user.comparePassword(password);
-        if (!isMatched){
-         
-          return  next(new ErrorResponse('Invalid credentials', 400))
-        }
-
-        generateToken(user, 200, res);
+    // verify user password
+    const isMatched = await user.comparePassword(password);
+    if (!isMatched) {
+      return next(new ErrorResponse("Invalid credentials", 400));
     }
-    catch(error){
-        console.log(error);
-       
-        next(new ErrorResponse('Cannot log in, check your credentials', 400))
-    }
-   
-}
 
+    generateToken(user, 200, res);
+  } catch (error) {
+    console.log(error);
 
-const generateToken = async (user, statusCode, res) =>{
+    next(new ErrorResponse("Cannot log in, check your credentials", 400));
+  }
+};
 
-    const token = await user.jwtGenerateToken();
+const generateToken = async (user, statusCode, res) => {
+  const token = await user.jwtGenerateToken();
 
-    const options = {
-        httpOnly: true,
-        expiresIn: new Date(Date.now() + process.env.EXPIRE_TOKEN)
-    };
+  const options = {
+    httpOnly: true,
+    expiresIn: new Date(Date.now() + process.env.EXPIRE_TOKEN),
+  };
 
-    res
-    .status(statusCode)
-    .cookie('token', token, options )
-    .json({success: true, token})
-}
-
+  res.status(statusCode).cookie("token", token, options).json({ success: true, token });
+};
 
 //LOG OUT USER
-exports.logout = (req, res, next)=>{
-    res.clearCookie('token');
+exports.logout = (req, res, next) => {
+  res.clearCookie("token");
+  res.status(200).json({
+    success: true,
+    message: "Logged out",
+  });
+};
+
+// USESR PROFILE
+exports.userProfile = async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  res.status(200).json({
+    sucess: true,
+    user,
+  });
+};
+
+exports.singleUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
     res.status(200).json({
-        success: true,
-        message: "Logged out"
-    })
-}
-
-
-
-// USESR PROFILE 
-exports.userProfile = async (req, res, next)=>{
-
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-        sucess: true,
-        user
+      sucess: true,
+      user,
     });
-}
-
-
-exports.singleUser = async (req, res, next)=>{
-
-    try {
-        const user = await User.findById(req.params.id);
-        res.status(200).json({
-            sucess: true,
-            user
-        })
-        
-    } catch (error) {
-        next(error)
-        
-    }
-   
-}
+  } catch (error) {
+    next(error);
+  }
+};
