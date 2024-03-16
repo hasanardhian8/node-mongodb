@@ -1,41 +1,38 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const User = require("../models/usersdb");
-const ErrorResponse = require('../utils/errorResponse');
-
+const ErrorResponse = require("../utils/errorResponse");
 
 // check if user is authenticated
-exports.isAuthenticated = async (req, res, next) =>{
+exports.isAuthenticated = async (req, res, next) => {
+  const { token } = req.cookies;
 
-    const {token} = req.cookies;
+  // make sure token exists
+  if (!token) {
+    return next(new ErrorResponse("You must log in to access this ressource", 401));
+  }
 
-    // make sure token exists
-    if (!token){
-        return next (new ErrorResponse('You must log in to access this ressource', 401));
-    }
-
-    try {
-        //verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.id);
-        next();
-
-    } catch (error) {
-        return next (new ErrorResponse('You must log in to access this ressource', 401));
-    }
-}
+  try {
+    //verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id);
+    next();
+  } catch (error) {
+    return next(new ErrorResponse("You must log in to access this ressource", 401));
+  }
+};
 
 // admin middleware
-exports.isAdmin = (req, res, next) =>{
-    if (req.user.role !== 0){
-        return next (new ErrorResponse('Access denied, you must be an admin', 401));
-    }
-    next();
-}
+exports.isAdmin = (req, res, next) => {
+  if (req.user.role !== 0) {
+    return next(new ErrorResponse("Access denied, you must be an admin", 401));
+  }
+  next();
+};
 
 // manager middleware
-exports.isManager = (req, res, next) =>{
-    if (req.user.role !== 1 || req.user.role !== 0){
-        return next (new ErrorResponse('Access denied', 401));
-    }
-    next();
-}
+exports.isManager = (req, res, next) => {
+  if (req.user.role !== 1 || req.user.role !== 0) {
+    return next(new ErrorResponse("Access denied", 401));
+  }
+  next();
+};
